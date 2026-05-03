@@ -6,9 +6,19 @@ It's tuned especially for **images that contain text** — memes, screenshots, s
 
 ## How it looks
 
-When you attach an image to a Bluesky post, an **✨ Auto** button appears next to Bluesky's own **+ ALT** chip in the upper-left of the thumbnail. Click it. After a second or two, the alt-text field fills in. If the alt-text dialog wasn't open yet, AutoAlt opens it, fills it, and clicks Done for you.
+When you attach an image to a Bluesky post, an **✨ Auto** button appears next to Bluesky's own **+ ALT** chip in the upper-left of the thumbnail.
+
+![AutoAlt's ✨ Auto button next to Bluesky's +ALT chip on an attached image of a cat](Screenshot1.jpg)
+
+Click it. After a second or two, the alt-text field fills in. If the alt-text dialog wasn't open yet, AutoAlt opens it, fills it, and clicks Done for you.
+
+![Generated alt text in Bluesky's alt-text dialog: "A light-colored cat with grey points and blue eyes lies on a beige carpet, looking up at a human finger reaching toward its nose." With the optional "I choose violence" attribution footer crediting gemini-3.1-flash-lite-preview.](Screenshot2.jpg)
 
 That's the whole UI. There's no streaming, no preview, no review step — it just writes the alt text. You can always click **+ ALT** afterwards to read or edit what it came up with.
+
+Provider, model, prompt, and the optional attribution footer are all configurable in Settings:
+
+![AutoAlt Settings page configured for Google Gemini, with the default prompt visible and the "I choose violence." checkbox enabled](Screenshot3.jpg)
 
 ## Supported providers
 
