@@ -256,10 +256,24 @@
     btn.type = "button";
     btn.className = BTN_CLASS;
     btn.title = "AutoAlt — generate alt text";
-    btn.innerHTML = '<span class="autoalt-glyph">✨</span><span class="autoalt-label">Auto</span>';
+    // contenteditable="false" makes this an atomic non-editable unit even
+    // when injected near a contenteditable subtree (Bluesky's post body),
+    // which prevents the button text from leaking into the post.
+    btn.setAttribute("contenteditable", "false");
+    btn.setAttribute("draggable", "false");
+    btn.setAttribute("aria-label", "AutoAlt — generate alt text");
+    btn.innerHTML =
+      '<span class="autoalt-glyph" contenteditable="false">✨</span>' +
+      '<span class="autoalt-label" contenteditable="false">Auto</span>';
+    btn.addEventListener("mousedown", (e) => {
+      // Don't let the editor steal focus or interpret the press.
+      e.preventDefault();
+      e.stopPropagation();
+    });
     btn.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
+      e.stopImmediatePropagation();
       handleClick(btn, img, container);
     });
 

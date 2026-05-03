@@ -17,6 +17,17 @@
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   transition: transform 0.08s ease, background 0.15s ease;
+  /* Belt-and-braces: never let the button text be selectable or
+     dragged into the post-body contenteditable. */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+}
+
+.autoalt-btn * {
+  user-select: none;
+  -webkit-user-select: none;
+  pointer-events: none;
 }
 
 /* When anchored next to Bluesky's +ALT button, sit inline beside it
