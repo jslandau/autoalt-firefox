@@ -22,7 +22,7 @@
     "open_in_tab": true
   },
   "background": {
-    "service_worker": "src/background.js",
+    "scripts": ["src/background.js"],
     "type": "module"
   },
   "content_scripts": [
@@ -40,5 +40,11 @@
     "https://generativelanguage.googleapis.com/*",
     "http://localhost/*",
     "http://127.0.0.1/*"
-  ]
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "autoalt@sjennings.brokentoys.org",
+      "strict_min_version": "121.0"
+    }
+  }
 }

@@ -1,6 +1,6 @@
 # AutoAlt
 
-A Chrome extension that generates alt text for images you post to Bluesky, using a vision model of your choice. Bring your own key.
+A browser extension (Chrome and Firefox) that generates alt text for images you post to Bluesky, using a vision model of your choice. Bring your own key.
 
 It's tuned especially for **images that contain text** — memes, screenshots, signs, diagrams. The default prompt asks the model to transcribe any visible text verbatim, and only fall back to description if the image has no text. (You can change that prompt; see below.)
 
@@ -52,7 +52,26 @@ API requests go directly from your browser to the provider you picked. Nothing r
 
 Click **Add to Chrome**, and the Settings page opens automatically on first install. Pick your provider, paste your API key, click **Save settings**, then head to https://bsky.app, start a post, attach an image, and click the **✨ Auto** button.
 
-### Or: install as an unpacked extension (for development)
+### Firefox
+
+**Install from Firefox Add-ons (AMO):**
+
+👉 **[AutoAlt on Firefox Add-ons](https://addons.mozilla.org/firefox/addon/autoalt/)** *(listing pending)*
+
+Click **Add to Firefox**, confirm the permissions prompt, and the Settings page opens automatically on first install.
+
+**Or: install as a temporary add-on (for development / testing):**
+
+Temporary add-ons are useful for development but are **removed when Firefox restarts** — permanent install requires AMO or signed packaging.
+
+1. Download or clone this folder somewhere stable on your machine.
+2. Open Firefox and go to `about:debugging#/runtime/this-firefox`.
+3. Click **Load Temporary Add-on** and select the `manifest.json` file (not the folder).
+4. The AutoAlt toolbar icon appears. Click it → **Settings**.
+5. Pick your provider, paste your API key, click **Save settings**.
+6. Open https://bsky.app, start a post, attach an image — click the **✨ Auto** button.
+
+### Or: install as an unpacked extension (Chrome, for development)
 
 If you want to hack on the code, run a local build, or you're offline:
 
@@ -67,10 +86,10 @@ If you ever update the extension code, hit the reload icon on the AutoAlt card i
 
 ## Settings
 
-Open Settings via the toolbar icon → **Settings**, or from `chrome://extensions` → AutoAlt → Details → Extension options.
+Open Settings via the toolbar icon → **Settings**, or from `chrome://extensions` → AutoAlt → Details → Extension options (Chrome), or from `about:debugging` → AutoAlt → Inspect (Firefox).
 
 - **Provider** — which API to use. Each provider has its own pane below for keys, model name, etc.
-- **API key / endpoint** — your credentials. Stored in `chrome.storage.local` on this machine only.
+- **API key / endpoint** — your credentials. Stored in `chrome.storage.local` (the extension local storage API, used by both Chrome and Firefox) on this machine only.
 - **Model** — leave blank to use the default for that provider, or override with any vision-capable model the provider exposes (e.g. `gpt-5-mini`, `claude-sonnet-4-5`, `gemini-3.0-pro`, `qwen2-vl`).
 - **Prompt** — the instruction sent to the model alongside each image. Default prioritises text transcription. Edit if you want shorter alt text, a different language, a more descriptive style, transcription-only, or anything else.
 - **I choose violence.** — when checked, AutoAlt appends `[This alt text added by <model> AI]` to every alt text it generates. Default off. Use at your own social risk.
@@ -93,14 +112,18 @@ ollama pull gemma4:e2b
 # or: ollama pull llama3.2-vision
 ```
 
-Chrome extensions can't reach `localhost:11434` unless Ollama explicitly allows the extension origin. You need to set `OLLAMA_ORIGINS` and restart the server.
+Browser extensions can't reach `localhost:11434` unless Ollama explicitly allows the extension origin. You need to set `OLLAMA_ORIGINS` and restart the server.
+
+**For both Chrome and Firefox**, use the cross-browser value `"chrome-extension://* moz-extension://*"`. If you only use one browser, you can set just the matching origin — but the combined value is harmless and future-proofs the config.
+
+> **Firefox note:** Firefox assigns each extension a random `moz-extension://<UUID>/` identifier per install (unlike Chrome's stable extension ID). This means the `*` wildcard is the practical choice for Firefox — see [Locking it down to AutoAlt only](#locking-it-down-to-autoalt-only) below.
 
 ### macOS — Ollama installed via Homebrew
 
 This is what most people on macOS have.
 
 ```bash
-launchctl setenv OLLAMA_ORIGINS "chrome-extension://*"
+launchctl setenv OLLAMA_ORIGINS "chrome-extension://* moz-extension://*"
 brew services restart ollama
 ```
 
@@ -110,7 +133,7 @@ That survives until reboot. To make it permanent, edit `~/Library/LaunchAgents/h
 <key>EnvironmentVariables</key>
 <dict>
     <key>OLLAMA_ORIGINS</key>
-    <string>chrome-extension://*</string>
+    <string>chrome-extension://* moz-extension://*</string>
 </dict>
 ```
 
@@ -121,7 +144,7 @@ Then `brew services restart ollama` once more.
 Quit Ollama from the menu bar, then in Terminal:
 
 ```bash
-launchctl setenv OLLAMA_ORIGINS "chrome-extension://*"
+launchctl setenv OLLAMA_ORIGINS "chrome-extension://* moz-extension://*"
 open -a Ollama
 ```
 
@@ -135,23 +158,27 @@ Add:
 
 ```ini
 [Service]
-Environment="OLLAMA_ORIGINS=chrome-extension://*"
+Environment="OLLAMA_ORIGINS=chrome-extension://* moz-extension://*"
 ```
 
 Then `sudo systemctl daemon-reload && sudo systemctl restart ollama`.
 
 ### Windows
 
-Set `OLLAMA_ORIGINS=chrome-extension://*` in System Environment Variables, then restart Ollama from the system tray.
+Set `OLLAMA_ORIGINS="chrome-extension://* moz-extension://*"` in System Environment Variables, then restart Ollama from the system tray.
 
 ### Verifying
 
 ```bash
+# Chrome:
 curl -s -i -H "Origin: chrome-extension://fakeid" http://localhost:11434/ \
+  | grep -i access-control-allow-origin
+# Firefox:
+curl -s -i -H "Origin: moz-extension://fakeid" http://localhost:11434/ \
   | grep -i access-control-allow-origin
 ```
 
-If you see `Access-Control-Allow-Origin: chrome-extension://fakeid` in the response, AutoAlt can talk to Ollama.
+If you see `Access-Control-Allow-Origin: chrome-extension://fakeid` (or `moz-extension://fakeid`) in the response, AutoAlt can talk to Ollama.
 
 ### Locking it down to AutoAlt only
 
@@ -163,9 +190,11 @@ launchctl setenv OLLAMA_ORIGINS "chrome-extension://abcdef0123456789..."
 
 The ID stays stable for an unpacked extension as long as you don't move the folder.
 
+**Firefox users:** Firefox assigns a random `moz-extension://<UUID>/` UUID to each install, and it is regenerated on every restart of a temporary (unpacked) add-on. For a permanent AMO install the UUID is stable per profile, but it differs between machines and profiles. The practical implication: you cannot reliably lock Ollama down to a specific Firefox extension UUID the way you can with Chrome's deterministic ID. Use `moz-extension://*` (the wildcard) for Firefox.
+
 ## Privacy
 
-- API keys live in `chrome.storage.local`. They never leave your browser except in the auth header on requests to the provider you configured.
+- API keys live in `chrome.storage.local` (the extension local storage API, used identically by Chrome and Firefox). They never leave your browser except in the auth header on requests to the provider you configured.
 - Images are sent only to that provider. AutoAlt makes zero requests to anywhere else — no telemetry, no analytics, no update checks.
 - Ollama traffic stays entirely on your machine.
 

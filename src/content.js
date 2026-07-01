@@ -16,8 +16,13 @@
         ? HTMLTextAreaElement.prototype
         : HTMLInputElement.prototype;
     const setter = Object.getOwnPropertyDescriptor(proto, "value")?.set;
-    if (setter) setter.call(el, value);
-    else el.value = value;
+    // Firefox Xray vision: the native value setter checks `this.constructor`,
+    // which Xray wrappers deny access to ("Permission denied to access property
+    // 'constructor'"). Waive Xray by using wrappedJSObject — undefined in
+    // Chrome, so the fallback is harmless.
+    const target = el.wrappedJSObject || el;
+    if (setter) setter.call(target, value);
+    else target.value = value;
     el.dispatchEvent(new Event("input", { bubbles: true }));
     el.dispatchEvent(new Event("change", { bubbles: true }));
   }
@@ -116,7 +121,11 @@
     const blob = await resp.blob();
     const mimeType = blob.type || "image/jpeg";
     const buf = await blob.arrayBuffer();
-    const bytes = new Uint8Array(buf);
+    // Firefox Xray: the ArrayBuffer from fetch/blob crosses into the content
+    // script context wrapped, and String.fromCharCode.apply triggers a
+    // .constructor check on the typed array that Xray denies. structuredClone
+    // produces a fully content-script-owned copy, avoiding the Xray boundary.
+    const bytes = new Uint8Array(structuredClone(buf));
     let binary = "";
     const chunk = 0x8000;
     for (let i = 0; i < bytes.length; i += chunk) {
