@@ -22,6 +22,25 @@ Provider, model, prompt, and the optional attribution footer are all configurabl
 
 ![AutoAlt Settings page configured for Google Gemini, with the default prompt visible and the "I choose violence." checkbox enabled](Screenshot3.jpg)
 
+## Install
+
+**Install from Firefox Add-ons (AMO):**
+
+👉 **[AutoAlt on Firefox Add-ons](https://addons.mozilla.org/firefox/addon/autoalt/)** *(listing pending)*
+
+Click **Add to Firefox**, confirm the permissions prompt, and the Settings page opens automatically on first install.
+
+**Or: install as a temporary add-on (for development / testing):**
+
+Temporary add-ons are useful for development but are **removed when Firefox restarts** — permanent install requires AMO or signed packaging.
+
+1. Download or clone this folder somewhere stable on your machine.
+2. Open Firefox and go to `about:debugging#/runtime/this-firefox`.
+3. Click **Load Temporary Add-on** and select the `manifest.json` file (not the folder).
+4. The AutoAlt toolbar icon appears. Click it → **Settings**.
+5. Pick your provider, paste your API key, click **Save settings**.
+6. Open https://bsky.app, start a post, attach an image — click the **✨ Auto** button.
+
 ## Supported providers
 
 | Provider  | Default model                   | Get a key                                            |
@@ -45,25 +64,6 @@ API requests go directly from your browser to the provider you picked. Nothing r
 **For most people, the answer is Google Gemini.** Generating alt text for one image is on the order of a few hundredths of a cent at frontier-model prices, and Google's free tier is more than generous enough to cover any reasonable amount of social-media posting at zero dollars. You will not run out. Anthropic and OpenAI are both excellent and similarly cheap if you'd rather give them your business — Anthropic's Claude Haiku 4.5 in particular tends to be the sharpest at OCR on dense or hard-to-read images. Either way, you're talking pocket change.
 
 **Ollama is the privacy-or-bust option, not the budget option.** It's tempting to assume that "free local model" beats "fractions of a cent," but in practice the small vision models Ollama can run on consumer hardware — `gemma4:e2b`, `qwen2-vl`, `llava`, etc. — produce noticeably more inconsistent results than frontier models. They miss text, hallucinate text that isn't there, and make worse judgment calls about what's worth describing. They're also 3–4× slower (see the Ollama section). The right reasons to choose Ollama are: you genuinely need your images to never leave your machine, or you're offline, or you enjoy tinkering. If your goal is "cheap and good," use Gemini's free tier instead.
-
-## Install
-
-**Install from Firefox Add-ons (AMO):**
-
-👉 **[AutoAlt on Firefox Add-ons](https://addons.mozilla.org/firefox/addon/autoalt/)** *(listing pending)*
-
-Click **Add to Firefox**, confirm the permissions prompt, and the Settings page opens automatically on first install.
-
-**Or: install as a temporary add-on (for development / testing):**
-
-Temporary add-ons are useful for development but are **removed when Firefox restarts** — permanent install requires AMO or signed packaging.
-
-1. Download or clone this folder somewhere stable on your machine.
-2. Open Firefox and go to `about:debugging#/runtime/this-firefox`.
-3. Click **Load Temporary Add-on** and select the `manifest.json` file (not the folder).
-4. The AutoAlt toolbar icon appears. Click it → **Settings**.
-5. Pick your provider, paste your API key, click **Save settings**.
-6. Open https://bsky.app, start a post, attach an image — click the **✨ Auto** button.
 
 ## Settings
 
