@@ -1,6 +1,8 @@
-# AutoAlt
+# AutoAlt for Firefox
 
-A browser extension (Chrome and Firefox) that generates alt text for images you post to Bluesky, using a vision model of your choice. Bring your own key.
+A Firefox extension that generates alt text for images you post to Bluesky, using a vision model of your choice. Bring your own key.
+
+> **Looking for the Chrome version?** This is a Firefox port. The original Chrome extension lives at [sjennings/autoalt](https://github.com/sjennings/autoalt).
 
 It's tuned especially for **images that contain text** — memes, screenshots, signs, diagrams. The default prompt asks the model to transcribe any visible text verbatim, and only fall back to description if the image has no text. (You can change that prompt; see below.)
 
@@ -46,14 +48,6 @@ API requests go directly from your browser to the provider you picked. Nothing r
 
 ## Install
 
-**The easiest way: install from the Chrome Web Store.**
-
-👉 **[AutoAlt on the Chrome Web Store](https://chromewebstore.google.com/detail/autoalt-alt-text-for-bsky/omknfaoaohkppapabnbihjdlallgkkco)**
-
-Click **Add to Chrome**, and the Settings page opens automatically on first install. Pick your provider, paste your API key, click **Save settings**, then head to https://bsky.app, start a post, attach an image, and click the **✨ Auto** button.
-
-### Firefox
-
 **Install from Firefox Add-ons (AMO):**
 
 👉 **[AutoAlt on Firefox Add-ons](https://addons.mozilla.org/firefox/addon/autoalt/)** *(listing pending)*
@@ -71,25 +65,12 @@ Temporary add-ons are useful for development but are **removed when Firefox rest
 5. Pick your provider, paste your API key, click **Save settings**.
 6. Open https://bsky.app, start a post, attach an image — click the **✨ Auto** button.
 
-### Or: install as an unpacked extension (Chrome, for development)
-
-If you want to hack on the code, run a local build, or you're offline:
-
-1. Download or clone this folder somewhere stable on your machine.
-2. Open Chrome and go to `chrome://extensions`.
-3. Toggle **Developer mode** on (top-right corner).
-4. Click **Load unpacked** and select the `autoalt/` folder.
-5. The Settings page opens automatically on first install. Pick your provider, paste your API key, click **Save settings**.
-6. Open https://bsky.app, start a post, attach an image — click the **✨ Auto** button.
-
-If you ever update the extension code, hit the reload icon on the AutoAlt card in `chrome://extensions`. **You also need to refresh any open Bluesky tabs after a reload** — the old content script in those tabs gets orphaned and won't be able to talk to the rebuilt service worker. AutoAlt will tell you so if you click the button before refreshing.
-
 ## Settings
 
-Open Settings via the toolbar icon → **Settings**, or from `chrome://extensions` → AutoAlt → Details → Extension options (Chrome), or from `about:debugging` → AutoAlt → Inspect (Firefox).
+Open Settings via the settings menu in about:addons, or from `about:debugging` → AutoAlt → Inspect (Firefox).
 
 - **Provider** — which API to use. Each provider has its own pane below for keys, model name, etc.
-- **API key / endpoint** — your credentials. Stored in `chrome.storage.local` (the extension local storage API, used by both Chrome and Firefox) on this machine only.
+- **API key / endpoint** — your credentials. Stored in `chrome.storage.local` (the extension local storage API) on this machine only.
 - **Model** — leave blank to use the default for that provider, or override with any vision-capable model the provider exposes (e.g. `gpt-5-mini`, `claude-sonnet-4-5`, `gemini-3.0-pro`, `qwen2-vl`).
 - **Prompt** — the instruction sent to the model alongside each image. Default prioritises text transcription. Edit if you want shorter alt text, a different language, a more descriptive style, transcription-only, or anything else.
 - **I choose violence.** — when checked, AutoAlt appends `[This alt text added by <model> AI]` to every alt text it generates. Default off. Use at your own social risk.
@@ -114,16 +95,14 @@ ollama pull gemma4:e2b
 
 Browser extensions can't reach `localhost:11434` unless Ollama explicitly allows the extension origin. You need to set `OLLAMA_ORIGINS` and restart the server.
 
-**For both Chrome and Firefox**, use the cross-browser value `"chrome-extension://* moz-extension://*"`. If you only use one browser, you can set just the matching origin — but the combined value is harmless and future-proofs the config.
-
-> **Firefox note:** Firefox assigns each extension a random `moz-extension://<UUID>/` identifier per install (unlike Chrome's stable extension ID). This means the `*` wildcard is the practical choice for Firefox — see [Locking it down to AutoAlt only](#locking-it-down-to-autoalt-only) below.
+**For Firefox**, use the value `"moz-extension://*"`. Because Firefox assigns each extension a random `moz-extension://<UUID>/` identifier per install (unlike Chrome's stable extension ID). This means the `*` wildcard is the practical choice for Firefox — see [Locking it down to AutoAlt only](#locking-it-down-to-autoalt-only) below.
 
 ### macOS — Ollama installed via Homebrew
 
 This is what most people on macOS have.
 
 ```bash
-launchctl setenv OLLAMA_ORIGINS "chrome-extension://* moz-extension://*"
+launchctl setenv OLLAMA_ORIGINS "moz-extension://*"
 brew services restart ollama
 ```
 
@@ -133,7 +112,7 @@ That survives until reboot. To make it permanent, edit `~/Library/LaunchAgents/h
 <key>EnvironmentVariables</key>
 <dict>
     <key>OLLAMA_ORIGINS</key>
-    <string>chrome-extension://* moz-extension://*</string>
+    <string>moz-extension://*</string>
 </dict>
 ```
 
@@ -144,7 +123,7 @@ Then `brew services restart ollama` once more.
 Quit Ollama from the menu bar, then in Terminal:
 
 ```bash
-launchctl setenv OLLAMA_ORIGINS "chrome-extension://* moz-extension://*"
+launchctl setenv OLLAMA_ORIGINS "moz-extension://*"
 open -a Ollama
 ```
 
@@ -158,51 +137,39 @@ Add:
 
 ```ini
 [Service]
-Environment="OLLAMA_ORIGINS=chrome-extension://* moz-extension://*"
+Environment="OLLAMA_ORIGINS=moz-extension://*"
 ```
 
 Then `sudo systemctl daemon-reload && sudo systemctl restart ollama`.
 
 ### Windows
 
-Set `OLLAMA_ORIGINS="chrome-extension://* moz-extension://*"` in System Environment Variables, then restart Ollama from the system tray.
+Set `OLLAMA_ORIGINS="moz-extension://*"` in System Environment Variables, then restart Ollama from the system tray.
 
 ### Verifying
 
 ```bash
-# Chrome:
-curl -s -i -H "Origin: chrome-extension://fakeid" http://localhost:11434/ \
-  | grep -i access-control-allow-origin
-# Firefox:
 curl -s -i -H "Origin: moz-extension://fakeid" http://localhost:11434/ \
   | grep -i access-control-allow-origin
 ```
 
-If you see `Access-Control-Allow-Origin: chrome-extension://fakeid` (or `moz-extension://fakeid`) in the response, AutoAlt can talk to Ollama.
+If you see `Access-Control-Allow-Origin: moz-extension://fakeid` in the response, AutoAlt can talk to Ollama.
 
 ### Locking it down to AutoAlt only
-
-`chrome-extension://*` lets *any* installed Chrome extension hit your local Ollama. If that bothers you, grab AutoAlt's extension ID from `chrome://extensions` (a 32-character string) and use that instead of `*`:
-
-```bash
-launchctl setenv OLLAMA_ORIGINS "chrome-extension://abcdef0123456789..."
-```
-
-The ID stays stable for an unpacked extension as long as you don't move the folder.
 
 **Firefox users:** Firefox assigns a random `moz-extension://<UUID>/` UUID to each install, and it is regenerated on every restart of a temporary (unpacked) add-on. For a permanent AMO install the UUID is stable per profile, but it differs between machines and profiles. The practical implication: you cannot reliably lock Ollama down to a specific Firefox extension UUID the way you can with Chrome's deterministic ID. Use `moz-extension://*` (the wildcard) for Firefox.
 
 ## Privacy
 
-- API keys live in `chrome.storage.local` (the extension local storage API, used identically by Chrome and Firefox). They never leave your browser except in the auth header on requests to the provider you configured.
+- API keys live in `chrome.storage.local` (the extension local storage API). They never leave your browser except in the auth header on requests to the provider you configured.
 - Images are sent only to that provider. AutoAlt makes zero requests to anywhere else — no telemetry, no analytics, no update checks.
 - Ollama traffic stays entirely on your machine.
 
 ## How it works (brief)
 
 - A content script on `bsky.app` watches the composer for image previews via `MutationObserver`. When it finds one, it injects the **✨ Auto** button beside Bluesky's `+ ALT` chip — without mutating any of Bluesky's own styles, which avoided a layout-breaking bug from an earlier version.
-- On click, the script reads the image (`fetch` on the `blob:` URL → base64) and sends it to the background service worker via `chrome.runtime.sendMessage`.
-- The service worker routes the request to the appropriate provider module in `src/providers/`, which handles that provider's specific API shape.
+- On click, the script reads the image (`fetch` on the `blob:` URL → base64) and sends it to the background script via `chrome.runtime.sendMessage`.
+- The background script routes the request to the appropriate provider module in `src/providers/`, which handles that provider's specific API shape.
 - The returned text is written into the Bluesky alt-text textarea using the React-controlled-input pattern (native `value` setter + dispatched `input` event), so Bluesky's React state actually updates rather than just the DOM.
 - If the alt-text dialog isn't open, the script clicks `+ ALT`, waits for the dialog, fills the textarea, and clicks **Done**.
 
@@ -222,7 +189,7 @@ autoalt/
 ├── icons/                   Toolbar icons (16/48/128)
 ├── README.md
 └── src/
-    ├── background.js        Service worker — config storage + provider routing
+    ├── background.js        Background script — config storage + provider routing
     ├── content.js           Bluesky DOM observer + button injection + alt-fill
     ├── content.css          Button styling
     ├── options.{html,js,css} BYOK settings page

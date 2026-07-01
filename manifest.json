@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "AutoAlt - Alt Text for bsky.app",
+  "name": "AutoAlt for Firefox - Alt Text for bsky.app",
   "version": "0.2.1",
   "description": "Generate alt text from images using your AI key (OpenAI, Anthropic, Google, or Ollama). Auto-fills bsky.app's alt field.",
   "icons": {
@@ -9,7 +9,7 @@
     "128": "icons/icon128.png"
   },
   "action": {
-    "default_title": "AutoAlt",
+    "default_title": "AutoAlt for Firefox",
     "default_popup": "src/popup.html",
     "default_icon": {
       "16": "icons/icon16.png",
@@ -43,7 +43,10 @@
   ],
   "browser_specific_settings": {
     "gecko": {
-      "id": "autoalt@sjennings.brokentoys.org",
+      "data_collection_permissions": {
+	"required": ["none"]
+	},
+      "id": "autoalt@jslandau.cc",
       "strict_min_version": "121.0"
     }
   }

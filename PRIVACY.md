@@ -2,7 +2,9 @@
 
 **Effective date:** 2026-05-03
 **Maintainer:** Scott Jennings (sjennings@brokentoys.org)
+**Firefox port maintainer**: Josh Landau (josh@jslandau.cc)
 **Source code:** https://github.com/sjennings/autoalt
+**Firefox source code:** https://github.com/jslandau/autoalt-firefox
 
 This document describes exactly what data AutoAlt handles, where it goes, and why. The extension is open source — every claim below can be verified by reading the code.
 
@@ -10,14 +12,14 @@ This document describes exactly what data AutoAlt handles, where it goes, and wh
 
 - AutoAlt does not collect, store, or transmit any data to its developer.
 - The only data AutoAlt sends anywhere is the image you click ✨ Auto on, plus your prompt, plus your API key — sent directly to the AI provider **you** chose and configured. There is no middleman.
-- API keys are stored on your device only, in the browser's extension local storage (`chrome.storage.local` in both Chrome and Firefox). They never leave your browser except in the authorization header on requests to your chosen provider.
+- API keys are stored on your device only, in the browser's extension local storage (`chrome.storage.local`). They never leave your browser except in the authorization header on requests to your chosen provider.
 - No analytics. No telemetry. No tracking. No advertising. No third parties besides the AI provider you yourself selected.
 
 ## What data AutoAlt handles
 
 ### Stored on your device only
 
-Saved in `chrome.storage.local` (the browser-managed local key/value store scoped to this extension, used identically by Chrome and Firefox):
+Saved in `chrome.storage.local` (the browser-managed local key/value store scoped to this extension):
 
 - The AI provider you selected (OpenAI, Anthropic, Google, or Ollama)
 - The API key (or, for Ollama, the local endpoint URL) you entered
@@ -47,7 +49,7 @@ It does not go anywhere else. AutoAlt makes no other network requests of any kin
 
 ### Sent to AutoAlt's developer
 
-**Nothing.** AutoAlt has no backend, no analytics service, no error reporting service, no crash reporting service, no update server (Chrome and Firefox handle updates through their respective extension stores independently of the extension's code). The extension's developer cannot see how you use the extension, what images you process, what prompts you write, or whether you have it installed.
+**Nothing.** AutoAlt has no backend, no analytics service, no error reporting service, no crash reporting service, no update server (Firefox handles updates through AMO independently of the extension's code). The extension's developer cannot see how you use the extension, what images you process, what prompts you write, or whether you have it installed.
 
 ## What the AI providers do with your data
 
@@ -73,7 +75,7 @@ Most cloud AI providers store API request data for some period for abuse detecti
 
 AutoAlt does not request, and the code does not use, the `tabs`, `cookies`, `webRequest`, `history`, `downloads`, or any other data-access permissions.
 
-> **Note on `browser_specific_settings`:** The manifest includes a `browser_specific_settings.gecko` block for Firefox (extension ID and minimum version). This is Firefox-specific metadata, not a permission — it does not grant any access to data or capabilities. Chrome ignores the key entirely.
+> **Note on `browser_specific_settings`:** The manifest includes a `browser_specific_settings.gecko` block (extension ID and minimum version). This is Firefox-specific metadata, not a permission — it does not grant any access to data or capabilities.
 
 ## Data sale, ads, and unrelated uses
 
@@ -88,10 +90,10 @@ AutoAlt is not directed at children. It does not knowingly collect data from any
 
 ## Changes to this policy
 
-If the data-handling behavior of AutoAlt changes, this policy will be updated, the effective date at the top will change, and the change will be reflected in the source repository's commit history. Material changes will be noted in the extension's release notes on the Chrome Web Store and Firefox Add-ons listings.
+If the data-handling behavior of AutoAlt changes, this policy will be updated, the effective date at the top will change, and the change will be reflected in the source repository's commit history. Material changes will be noted in the extension's release notes on the Firefox Add-ons listing.
 
 ## Contact
 
-Privacy questions, concerns, or corrections: **sjennings@brokentoys.org**.
+Privacy questions, concerns, or corrections: **sjennings@brokentoys.org**.  Unless it's related to Firefox only, in which case josh@jslandau.cc.
 
-You can also open an issue at https://github.com/sjennings/autoalt/issues for anything you'd be comfortable discussing publicly.
+You can also open an issue at https://github.com/sjennings/autoalt/issues for anything you'd be comfortable discussing publicly.  (Or, again, for Firefox-specific concerns, at https://github.com/jslandau/autoalt-firefox/issues.)
