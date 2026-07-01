@@ -26,7 +26,7 @@ Provider, model, prompt, and the optional attribution footer are all configurabl
 
 **Install from Firefox Add-ons (AMO):**
 
-👉 **[AutoAlt on Firefox Add-ons](https://addons.mozilla.org/firefox/addon/autoalt/)** *(listing pending)*
+👉 **[AutoAlt on Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/autoalt-alt-text-for-bsky-app/)** *(listing pending)*
 
 Click **Add to Firefox**, confirm the permissions prompt, and the Settings page opens automatically on first install.
 
