@@ -5,5 +5,8 @@
 .vscode/
 node_modules/
 *.log
+STORE_LISTING.md
 # CWS submission artifacts
 *.zip
+web-ext-artifacts/
+
